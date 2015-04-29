@@ -11,8 +11,9 @@ static TCHAR WindowsClass[] = L"win32app";
 static TCHAR Title[] = L"MyApp";
 HINSTANCE hinst;
 RECT desktop, cr;
-LRESULT cur_sel;
+LRESULT cur_sel, test;
 wchar_t str[40];
+bool buben;
 
 HWND list1, list2, button1, button2;
 
@@ -86,28 +87,35 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
-
+	
 	case WM_COMMAND:
-				
-
+	
 	case BN_CLICKED:
 
 		if (LOWORD(wParam) == ID_button1)
 		{
-			cur_sel = -1;
-			cur_sel = SendMessage(list1, LB_GETCURSEL, 0, 0);
+			
+			cur_sel = SendMessage(list1, LB_SETCURSEL, -1, 0);								//Переставляю курсор на -1 позицию, чтобы елсли юзер не выберет ничего, то ничего и не произойдет
+			cur_sel = SendMessage(list1, LB_GETCURSEL, 0, 0);								//Не пойму, почему эта функция возвращает 0 при невыбранной строке, должно быть -1?
 			SendMessage(list1, LB_GETTEXT, cur_sel, (LPARAM)str);							//Запомнить строку из выбранной позиции
 			SendMessage(list1, LB_DELETESTRING, cur_sel, 0);								//Удалить выбранную строку
+			if (str[0] == '\0')
+				break;
 			SendMessage(list2, LB_ADDSTRING, 0, (LPARAM)str);
+			str[0] = '\0';
 		}
 				
 		if (LOWORD(wParam) == ID_button2)
 		{
-			cur_sel = -1;
+			
+			cur_sel = SendMessage(list2, LB_SETCURSEL, -1, 0);
 			cur_sel = SendMessage(list2, LB_GETCURSEL, 0, 0);
 			SendMessage(list2, LB_GETTEXT, cur_sel, (LPARAM)str);							//Запомнить строку из выбранной позиции
 			SendMessage(list2, LB_DELETESTRING, cur_sel, 0);								//Удалить выбранную строку
+			if (str[0] == '\0')
+				break;
 			SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)str);
+			str[0] = '\0';
 		}
 			
 		
@@ -145,8 +153,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			(HMENU)ID_list1,
 			hinst,
 			NULL);
-				
-		
+					
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Один");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Два");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Три");
