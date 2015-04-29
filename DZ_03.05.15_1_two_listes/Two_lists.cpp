@@ -11,7 +11,8 @@ static TCHAR WindowsClass[] = L"win32app";
 static TCHAR Title[] = L"MyApp";
 HINSTANCE hinst;
 RECT desktop, cr;
-LRESULT cur_sel, count;
+LRESULT cur_sel;
+wchar_t str[40];
 
 HWND list1, list2, button1, button2;
 
@@ -87,25 +88,27 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 
 	case WM_COMMAND:
-
-		if (LOWORD(wParam) == ID_list1 && HIWORD(wParam) == CBN_SELENDOK) {
-			cur_sel = SendMessage(list1, CB_GETCURSEL, 0, 0);									//Получить номер выбранной позиции
-			count = SendMessage(list1, CB_GETCOUNT, 0, 0);										//Узнать количество строк в списке
-			if (cur_sel < count - 1)
-				EnableWindow(button1, TRUE);														//Активировать кнопку
-		}
+				
 
 	case BN_CLICKED:
 
-		
+		if (LOWORD(wParam) == ID_button1)
+		{
+			cur_sel = -1;
+			cur_sel = SendMessage(list1, LB_GETCURSEL, 0, 0);
+			SendMessage(list1, LB_GETTEXT, cur_sel, (LPARAM)str);							//Запомнить строку из выбранной позиции
+			SendMessage(list1, LB_DELETESTRING, cur_sel, 0);								//Удалить выбранную строку
+			SendMessage(list2, LB_ADDSTRING, 0, (LPARAM)str);
+		}
 				
-											//Запомнить строку из выбранной позиции
-									//Записать выбранную строку в нужную позицию
-													//Установить курсор в эту позицию
-			
-			
-				
-																//Деактивировать кнопку
+		if (LOWORD(wParam) == ID_button2)
+		{
+			cur_sel = -1;
+			cur_sel = SendMessage(list2, LB_GETCURSEL, 0, 0);
+			SendMessage(list2, LB_GETTEXT, cur_sel, (LPARAM)str);							//Запомнить строку из выбранной позиции
+			SendMessage(list2, LB_DELETESTRING, cur_sel, 0);								//Удалить выбранную строку
+			SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)str);
+		}
 			
 		
 
@@ -142,10 +145,8 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			(HMENU)ID_list1,
 			hinst,
 			NULL);
-
+				
 		
-
-		//SendMessage(list1, WM_SETTEXT, 0, (LPARAM)L"Выберите строку из выпадающего списка");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Один");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Два");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Три");
@@ -153,7 +154,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Пять");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Шесть");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Семь");
-		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Восем");
+		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Восемь");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Девять");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Десять");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Одиннадцать");
