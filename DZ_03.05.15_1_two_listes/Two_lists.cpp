@@ -11,9 +11,9 @@ static TCHAR WindowsClass[] = L"win32app";
 static TCHAR Title[] = L"MyApp";
 HINSTANCE hinst;
 RECT desktop, cr;
-LRESULT cur_sel, test;
+LRESULT cur_sel, count;
 wchar_t str[40];
-bool buben;
+WORD focus;
 
 HWND list1, list2, button1, button2;
 
@@ -87,38 +87,56 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 	switch (message)
 	{
-	
 	case WM_COMMAND:
-	
+
 	case BN_CLICKED:
 
-		if (LOWORD(wParam) == ID_button1)
+		if (LOWORD(wParam) != ID_button1 && LOWORD(wParam) != ID_button2)
+			focus = LOWORD(wParam);
+
+		if (LOWORD(wParam) == ID_button1 && focus == ID_list1)
+
 		{
-			
-			cur_sel = SendMessage(list1, LB_SETCURSEL, -1, 0);								//Переставляю курсор на -1 позицию, чтобы елсли юзер не выберет ничего, то ничего и не произойдет
-			cur_sel = SendMessage(list1, LB_GETCURSEL, 0, 0);								//Не пойму, почему эта функция возвращает 0 при невыбранной строке, должно быть -1?
-			SendMessage(list1, LB_GETTEXT, cur_sel, (LPARAM)str);							//Запомнить строку из выбранной позиции
-			SendMessage(list1, LB_DELETESTRING, cur_sel, 0);								//Удалить выбранную строку
-			if (str[0] == '\0')
-				break;
+			//cur_sel = SendMessage(list1, LB_SETCURSEL, -1, 0);						//Переставляю курсор на -1 позицию, чтобы елсли юзер не выберет ничего, то ничего и не произойдет
+			cur_sel = SendMessage(list1, LB_GETCURSEL, 0, 0);							//Не пойму, почему эта функция возвращает 0 при невыбранной строке, должно быть -1?
+			SendMessage(list1, LB_GETTEXT, cur_sel, (LPARAM)str);						//Запомнить строку из выбранной позиции
+			SendMessage(list1, LB_DELETESTRING, cur_sel, 0);							//Удалить выбранную строку
 			SendMessage(list2, LB_ADDSTRING, 0, (LPARAM)str);
+			count = SendMessage(list1, LB_GETCOUNT, 0, 0);
+			if (!count)
+				EnableWindow(button1, FALSE);
+			else
+				EnableWindow(button1, TRUE);
+			count = SendMessage(list2, LB_GETCOUNT, 0, 0);
+			if (!count)
+				EnableWindow(button2, FALSE);
+			else
+				EnableWindow(button2, TRUE);
 			str[0] = '\0';
+			focus = NULL;
+
 		}
-				
-		if (LOWORD(wParam) == ID_button2)
+
+		if (LOWORD(wParam) == ID_button2 && focus == ID_list2)
 		{
-			
-			cur_sel = SendMessage(list2, LB_SETCURSEL, -1, 0);
+			//cur_sel = SendMessage(list2, LB_SETCURSEL, -1, 0);
 			cur_sel = SendMessage(list2, LB_GETCURSEL, 0, 0);
-			SendMessage(list2, LB_GETTEXT, cur_sel, (LPARAM)str);							//Запомнить строку из выбранной позиции
-			SendMessage(list2, LB_DELETESTRING, cur_sel, 0);								//Удалить выбранную строку
-			if (str[0] == '\0')
-				break;
+			SendMessage(list2, LB_GETTEXT, cur_sel, (LPARAM)str);						//Запомнить строку из выбранной позиции
+			SendMessage(list2, LB_DELETESTRING, cur_sel, 0);							//Удалить выбранную строку
 			SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)str);
+			count = SendMessage(list2, LB_GETCOUNT, 0, 0);
+			if (!count)
+				EnableWindow(button2, FALSE);
+			else
+				EnableWindow(button2, TRUE);
+			count = SendMessage(list1, LB_GETCOUNT, 0, 0);
+			if (!count)
+				EnableWindow(button1, FALSE);
+			else
+				EnableWindow(button1, TRUE);
 			str[0] = '\0';
+			focus = NULL;
 		}
-			
-		
 
 		break;
 
@@ -150,10 +168,10 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			cr.right / 8 * 2.5,
 			cr.bottom / 2,
 			hWnd,
-			(HMENU)ID_list1,
+			(HMENU)ID_list2,
 			hinst,
 			NULL);
-					
+
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Один");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Два");
 		SendMessage(list1, LB_ADDSTRING, 0, (LPARAM)L"Три");
@@ -174,7 +192,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			WS_CHILD | WS_VISIBLE,
 			cr.right / 9 * 3.75,
 			cr.bottom / 3,
-			cr.right / 9*1.5,
+			cr.right / 9 * 1.5,
 			30,
 			hWnd,
 			(HMENU)ID_button1,
@@ -192,6 +210,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 			hWnd,
 			(HMENU)ID_button2,
 			hinst, NULL);
+		EnableWindow(button2, FALSE);
 		break;
 
 	case WM_PAINT:
